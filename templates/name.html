@@ -1,0 +1,16 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<h2>{{ name }}</h2>
+
+<div>
+  <ul>
+    {% for item in gift_lst %}
+      <li>{{ item }}</li>
+    {% endfor %}
+  </ul>
+</div>
+<div>
+  <p><a href="{{ url_for('edit_person', id=id) }}">Edit List</a></p>
+</div>
+{% endblock %}

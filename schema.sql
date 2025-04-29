@@ -1,0 +1,11 @@
+CREATE TABLE Person (
+    id serial PRIMARY KEY,
+    name VARCHAR(30) NOT NULL UNIQUE
+);
+
+CREATE TABLE Gift (
+    id serial PRIMARY KEY,
+    person_id integer NOT NULL,
+    gift VARCHAR(50) NOT NULL,
+    FOREIGN KEY (person_id) REFERENCES Person(id) ON DELETE CASCADE
+);

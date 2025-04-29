@@ -1,0 +1,16 @@
+{% extends "layout.html" %}
+
+{% block content %}
+{% if people|length == 0 %}
+    <p>You don't have any people saved. <a href="{{ url_for('add_person') }}">Add a person</a> to get started.</p>
+{% else %}
+    <ul>
+        {% for person in people %}
+        <li>
+            <a href="{{ url_for('person', id=person['id']) }}">{{ person['name'] }}</a>
+        </li>
+        {% endfor %}
+    </ul>
+{% endif %}
+{% endblock %}
+

@@ -1,0 +1,31 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<h2>Search</h2>
+
+<form action="{{ url_for('search') }}" method="get">
+  <input name="query" value="{{ query }}"/>
+  <button type="submit">Search</button>
+</form>
+
+{% if query %}
+  {% if results | length == 0 %}
+    <p>Sorry, no matches were found.</p>
+  {% else %}
+    <h2>Results for '{{ query }}'</h2>
+    <ul>
+      {% for result in results %}
+        <li>
+          <h4><a href="{{ url_for('person', id=result.id) }}">{{ result.name }}</a></h4>
+          <ul>
+          {% for item in result.items_lst %}
+            <li>{{ item }}</li>
+          {% endfor %}
+          </ul>
+        </li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+{% endif %}
+
+{% endblock %}

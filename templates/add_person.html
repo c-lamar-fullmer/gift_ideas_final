@@ -1,0 +1,34 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<section id="todos">
+    <header>
+        <h2>Add a New Person</h2>
+    </header>
+</section>
+
+<div>
+<form action="{{ url_for('add_person') }}" method="post">
+    <dl>
+        <dt>
+            <label for="name">Enter the Name:</label>
+        </dt>
+        <dd>
+            <input type="text" name="name" placeholder="Name" value="{{ name }}" size="50">
+        </dd>
+
+        <dt>
+            <label for="gifts">Enter your gift ideas, one line at a time:</label>
+        </dt>
+        <dd>
+            <textarea name="gifts" placeholder="Add your list here" rows="10" 
+            cols="50">{{ gift_lst }}</textarea>
+        </dd>
+    </dl>
+    <fieldset>
+        <input type="submit" value="Save">
+        <a href="{{ url_for('home') }}">Cancel</a>
+    </fieldset>
+</form>
+</div>
+{% endblock %}

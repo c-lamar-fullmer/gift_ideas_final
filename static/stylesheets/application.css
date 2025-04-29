@@ -1,0 +1,148 @@
+/* General body styling */
+body {
+    font-family: Arial, sans-serif;
+    margin: 20px;
+    line-height: 1.6;
+    background-color: #f4f4f9; /* Soft background color */
+    color: #333; /* Dark text for contrast */
+}
+
+/* Headings */
+h2 {
+    color: #2c3e50; /* Deep blue-gray color */
+    margin-bottom: 15px;
+}
+
+/* Links */
+a {
+    color: #3498db; /* Bright blue */
+    text-decoration: none; /* Remove underline */
+}
+
+a:hover {
+    text-decoration: underline; /* Add underline on hover */
+}
+
+/* Lists */
+ul {
+    list-style-type: none; /* Removes bullets */
+    padding: 0;
+}
+
+ul li {
+    padding: 5px 0; /* Spacing between list items */
+}
+
+/* Buttons and inputs */
+input[type="submit"], button {
+    background-color: #3498db;
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+input[type="submit"]:hover, button:hover {
+    background-color: #2980b9; /* Darker blue on hover */
+}
+
+/* Flash messages */
+.flash {
+    margin: 15px 0;
+    padding: 10px;
+    border-radius: 5px;
+}
+
+.flash.success {
+    background-color: #dff0d8; /* Green for success */
+    color: #3c763d;
+}
+
+.flash.error {
+    background-color: #f2dede; /* Red for errors */
+    color: #a94442;
+}
+
+/* Form styling */
+form {
+    margin-bottom: 20px;
+}
+
+form dl {
+    margin: 10px 0;
+}
+
+form dt {
+    font-weight: bold; /* Bold labels */
+}
+
+form dd {
+    margin: 5px 0;
+}
+
+/* Text inputs and textareas */
+input[type="text"], textarea {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-sizing: border-box;
+}
+
+textarea {
+    resize: vertical; /* Allow vertical resizing only */
+}
+
+/* Fieldset styling */
+fieldset {
+    border: none;
+    margin: 10px 0;
+}
+
+/* Page sections */
+section#todos {
+    margin-bottom: 20px;
+}
+
+header {
+    border-bottom: 1px solid #ccc;
+    margin-bottom: 15px;
+    padding-bottom: 5px;
+}
+
+/* Navigation styling */
+.navigation {
+    margin-top: 20px;
+    padding: 15px;
+    background-color: #eaeaea; /* Light gray background */
+    border-radius: 5px; /* Rounded corners */
+    text-align: center; /* Center-align links */
+}
+
+.navigation p {
+    margin: 10px 0; /* Spacing between links */
+}
+
+.navigation a {
+    font-weight: bold; /* Bold links */
+    color: #2c3e50; /* Dark blue-gray color */
+    text-decoration: none; /* Remove underline */
+}
+
+.navigation a:hover {
+    text-decoration: underline; /* Add underline on hover */
+    color: #3498db; /* Bright blue hover color */
+}
+
+ul {
+    list-style-type: disc; /* Standard bullet points */
+    padding-left: 20px;    /* Indent the list */
+    margin: 10px 0;        /* Add spacing above and below */
+}
+
+ul li {
+    line-height: 1.5;      /* Add spacing between lines */
+    color: #333;           /* Standard text color */
+}

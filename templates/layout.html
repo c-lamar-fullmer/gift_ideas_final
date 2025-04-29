@@ -1,0 +1,41 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gift Ideas List</title>
+    <!-- Link to the CSS file -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='stylesheets/application.css') }}">
+</head>
+<body>
+  <h1>Gift Ideas List</h1>
+  
+  <!-- Flash messages -->
+  <div>
+    {% with messages = get_flashed_messages(with_categories=True) %}
+      {% if messages %}
+        {% for category, message in messages %}
+            <div class="flash {{ category }}">
+                <p>{{ message }}</p>
+            </div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+  </div>
+  
+  <!-- Main content block -->
+  <div>
+    {% block content %}{% endblock %}
+  </div>
+  
+  <!-- Navigation links -->
+  <div class="navigation">
+    <p><a href="{{ url_for('home') }}">Home</a></p>
+    <p><a href="{{ url_for('search') }}">Search</a></p>
+    <p><a href="{{ url_for('add_person') }}">Add New Person</a></p>
+  </div>
+
+  <!-- Include JavaScript -->
+  <script src="{{ url_for('static', filename='javascripts/application.js') }}"></script>
+</body>
+</html>
