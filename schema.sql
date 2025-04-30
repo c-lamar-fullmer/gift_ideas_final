@@ -1,12 +1,14 @@
 CREATE TABLE Users (
     id SERIAL PRIMARY KEY,
     username VARCHAR(50) NOT NULL UNIQUE,
-    password_hash VARCHAR(255) NOT NULL,
+    password_hash VARCHAR(255) NOT NULL
 );
 
 CREATE TABLE Person (
     id serial PRIMARY KEY,
-    name VARCHAR(30) NOT NULL UNIQUE
+    user_id INTEGER NOT NULL,
+    name VARCHAR(30) NOT NULL UNIQUE,
+    FOREIGN KEY (user_id) REFERENCES Users(id) ON DELETE CASCADE
 );
 
 CREATE TABLE Gift (

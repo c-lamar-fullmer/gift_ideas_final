@@ -1,16 +1,30 @@
 {% extends "layout.html" %}
 
 {% block content %}
-{% if people|length == 0 %}
-    <p>You don't have any people saved. <a href="{{ url_for('add_person') }}">Add a person</a> to get started.</p>
-{% else %}
+  {% if g.user_id %}
+    <h2>Welcome to your Gift Ideas List!</h2>
+    <p>Here are the people and their gift ideas:</p>
     <ul>
-        {% for person in people %}
-        <li>
-            <a href="{{ url_for('person', id=person['id']) }}">{{ person['name'] }}</a>
-        </li>
-        {% endfor %}
+      {% for person in people %}
+        <li><a href="{{ url_for('person', id=person.id) }}">{{ person.name }}</a></li>
+      {% endfor %}
     </ul>
-{% endif %}
+  {% else %}
+    <h2>Welcome to the Gift Ideas List!</h2>
+    <p>Please <a href="{{ url_for('login') }}">log in</a> or <a href="{{ url_for('register') }}">register</a> to view and manage your gift ideas.</p>
+  {% endif %}
 {% endblock %}
 
+{% block navigation %}
+  <div class="navigation">
+    <p><a href="{{ url_for('home') }}">Home</a></p>
+    {% if g.user_id %}
+      <p><a href="{{ url_for('search') }}">Search</a></p>
+      <p><a href="{{ url_for('add_person') }}">Add New Person</a></p>
+      <p><a href="{{ url_for('logout') }}">Logout</a></p>
+    {% else %}
+      <p><a href="{{ url_for('login') }}">Login</a></p>
+      <p><a href="{{ url_for('register') }}">Register</a></p>
+    {% endif %}
+  </div>
+{% endblock %}
