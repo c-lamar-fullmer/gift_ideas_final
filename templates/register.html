@@ -1,0 +1,40 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<section id="authentication">
+    <header>
+        <h2>Register</h2>
+    </header>
+</section>
+
+<div>
+    <form action="{{ url_for('register') }}" method="post">
+        <dl>
+            <dt>
+                <label for="username">Username:</label>
+            </dt>
+            <dd>
+                <input type="text" name="username" value="{{ request.form['username'] if request.form else '' }}" size="50" required>
+            </dd>
+
+            <dt>
+                <label for="password">Password:</label>
+            </dt>
+            <dd>
+                <input type="password" name="password" size="50" required>
+            </dd>
+
+            <dt>
+                <label for="confirm_password">Confirm Password:</label>
+            </dt>
+            <dd>
+                <input type="password" name="confirm_password" size="50" required>
+            </dd>
+        </dl>
+        <fieldset>
+            <input type="submit" value="Register">
+            <a href="{{ url_for('login') }}">Already have an account? Login</a>
+        </fieldset>
+    </form>
+</div>
+{% endblock %}
