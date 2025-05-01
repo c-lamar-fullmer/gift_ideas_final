@@ -146,3 +146,30 @@ ul li {
     line-height: 1.5;      /* Add spacing between lines */
     color: #333;           /* Standard text color */
 }
+
+/* Pagination styling - Simple and easy to understand */
+.pagination {
+    margin-top: 20px; /* Add some space above the pagination controls */
+    text-align: center; /* Center the controls */
+}
+
+.pagination a, .pagination span {
+    display: inline-block; /* Make them sit next to each other */
+    padding: 8px 12px; /* Add some padding inside the links/span */
+    margin: 0 5px; /* Add some space between the links/span */
+    border: 1px solid #ccc; /* Light gray border */
+    text-decoration: none; /* Remove underlines from links */
+    border-radius: 5px; /* Slightly rounded corners */
+    background-color: #f9f9f9; /* Light background color */
+    color: #333; /* Dark text color */
+}
+
+.pagination a:hover {
+    background-color: #eee; /* Slightly darker background on hover */
+}
+
+.pagination .current {
+    background-color: #3498db; /* Blue background for the current page */
+    color: white; /* White text for the current page */
+    border-color: #3498db; /* Blue border for the current page */
+}

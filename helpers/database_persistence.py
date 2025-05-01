@@ -1,3 +1,5 @@
+# database_persistence.py
+
 import os
 from contextlib import contextmanager
 import logging
@@ -12,6 +14,7 @@ logger = logging.getLogger(__name__)
 class DatabasePersistence:
     def __init__(self):
         self._setup_schema()
+        self.ITEMS_PER_PAGE = 5  # Define the number of people per page
 
     @contextmanager
     def _database_connect(self):
@@ -43,32 +46,74 @@ class DatabasePersistence:
                 cursor.execute(query, params or ())
                 conn.commit()
 
-    def get_all_people(self, user_id):
+    def get_paginated_people(self, user_id, page):
+        offset = (page - 1) * self.ITEMS_PER_PAGE
         query = """
-            SELECT P.id, P.name, ARRAY_AGG(G.gift) AS gift_lst
+            SELECT P.id, P.name
             FROM Person P
-            LEFT JOIN Gift G ON P.id = G.person_id
             WHERE P.user_id = %s
-            GROUP BY P.id
-            ORDER BY P.name;
+            ORDER BY P.name
+            LIMIT %s OFFSET %s;
         """
-        results = self._execute_query(query, (user_id,))
+        results = self._execute_query(query, (user_id, self.ITEMS_PER_PAGE, offset))
         return [dict(row) for row in results]
+
+    def get_person_count(self, user_id):
+        query = """
+            SELECT COUNT(*) FROM Person WHERE user_id = %s;
+        """
+        result = self._execute_one(query, (user_id,))
+        return result['count'] if result else 0
 
     def find_person(self, person_id, user_id):
         query = """
-            SELECT P.id, P.name, ARRAY_AGG(G.gift) AS gift_lst
+            SELECT P.id, P.name
             FROM Person P
-            LEFT JOIN Gift G ON P.id = G.person_id
-            WHERE P.id = %s AND P.user_id = %s
-            GROUP BY P.id;
+            WHERE P.id = %s AND P.user_id = %s;
         """
         person = self._execute_one(query, (person_id, user_id))
         return dict(person) if person else None
 
+    def find_person_with_gifts(self, person_id, user_id, page, gifts_per_page):
+        offset = (page - 1) * gifts_per_page
+        query = """
+            SELECT P.id, P.name,
+                   (SELECT COUNT(*) FROM Gift WHERE person_id = P.id) AS total_gifts,
+                   COALESCE(ARRAY_AGG(G.gift ORDER BY G.id) FILTER (WHERE G.gift IS NOT NULL), ARRAY[]::VARCHAR[]) AS all_gifts
+            FROM Person P
+            LEFT JOIN Gift G ON P.id = G.person_id
+            WHERE P.id = %s AND P.user_id = %s
+            GROUP BY P.id, P.name;
+        """
+        person_data = self._execute_one(query, (person_id, user_id))
+
+        if not person_data:
+            return None
+
+        # Convert to a standard dictionary
+        person_data = dict(person_data)
+
+        # Add paginated gifts
+        person_data['paginated_gifts'] = []
+        if 'all_gifts' in person_data and person_data['all_gifts']:
+            all_gifts = person_data['all_gifts']
+            person_data['paginated_gifts'] = all_gifts[offset:offset + gifts_per_page]
+
+        # Add gift_lst (all gifts)
+        person_data['gift_lst'] = person_data.get('all_gifts', [])
+
+        return person_data
+
+    def get_gift_count(self, person_id):
+        query = """
+            SELECT COUNT(*) FROM Gift WHERE person_id = %s;
+        """
+        result = self._execute_one(query, (person_id,))
+        return result['count'] if result else 0
+
     def validate_person(self, name, gift_lst, user_id, exclude_id=None):
-        MAX_NAME_LENGTH = 30
-        MAX_GIFT_LENGTH = 50
+        MAX_NAME_LENGTH = 50
+        MAX_GIFT_LENGTH = 100
 
         query = "SELECT id FROM Person WHERE LOWER(name) = LOWER(%s) AND user_id = %s"
         existing_person = self._execute_one(query, (name, user_id))
@@ -113,18 +158,44 @@ class DatabasePersistence:
         query = "DELETE FROM Person WHERE id = %s AND user_id = %s"
         self._execute_none(query, (person_id, user_id))
 
-    def search_matching(self, query, user_id):
-        """Search for gifts matching a query for a specific user."""
+    def search_matching_with_gifts(self, query_str, user_id, page, gifts_per_page, gift_page):
+        offset_people = (page - 1) * self.ITEMS_PER_PAGE
+        offset_gifts = (gift_page - 1) * gifts_per_page
         search_query = """
-            SELECT P.id, P.name, ARRAY_AGG(G.gift) AS items_lst
+            SELECT
+                P.id,
+                P.name,
+                (SELECT COUNT(G2.gift) FROM Gift G2 WHERE G2.person_id = P.id AND LOWER(G2.gift) LIKE %s) AS total_gifts,
+                ARRAY_AGG(G.gift ORDER BY G.id) AS all_gifts
             FROM Person P
             JOIN Gift G ON P.id = G.person_id
             WHERE LOWER(G.gift) LIKE %s AND P.user_id = %s
-            GROUP BY P.id
-            ORDER BY P.name;
+            GROUP BY P.id, P.name
+            ORDER BY P.name
+            LIMIT %s OFFSET %s;
         """
-        results = self._execute_query(search_query, (f"%{query.lower()}%", user_id))
-        return [dict(result) for result in results]
+        results = self._execute_query(search_query, (f"%{query_str.lower()}%", f"%{query_str.lower()}%", user_id, self.ITEMS_PER_PAGE, offset_people))
+        processed_results = []
+        for result in results:
+            # Convert result to a standard dictionary
+            result = dict(result)
+            all_gifts = result.get('all_gifts', [])
+            # Filter gifts to include only those matching the query
+            matching_gifts = [gift for gift in all_gifts if query_str.lower() in gift.lower()]
+            paginated_gifts = matching_gifts[offset_gifts:offset_gifts + gifts_per_page]
+            result['paginated_gifts'] = paginated_gifts
+            processed_results.append(result)
+        return {'results': processed_results}
+
+    def get_search_result_count(self, query, user_id):
+        search_query = """
+            SELECT COUNT(DISTINCT P.id)
+            FROM Person P
+            JOIN Gift G ON P.id = G.person_id
+            WHERE LOWER(G.gift) LIKE %s AND P.user_id = %s;
+        """
+        result = self._execute_one(search_query, (f"%{query.lower()}%", user_id))
+        return result['count'] if result else 0
 
     def create_user(self, username, password):
         """Creates a new user in the database."""
@@ -156,8 +227,9 @@ class DatabasePersistence:
                     cursor.execute("""
                         CREATE TABLE Person (
                             id SERIAL PRIMARY KEY,
-                            name VARCHAR(30) NOT NULL UNIQUE,
-                            user_id INTEGER NOT NULL REFERENCES Users(id) ON DELETE CASCADE
+                            name VARCHAR(50) NOT NULL,
+                            user_id INTEGER NOT NULL REFERENCES Users(id) ON DELETE CASCADE,
+                            UNIQUE (user_id, name)
                         );
                     """)
                     logger.info("Created table: Person")
@@ -176,6 +248,20 @@ class DatabasePersistence:
                             ADD COLUMN user_id INTEGER NOT NULL REFERENCES Users(id) ON DELETE CASCADE;
                         """)
                         logger.info("Added user_id column to Person table.")
+                    # Add unique constraint if missing (important for the logic)
+                    cursor.execute("""
+                        SELECT constraint_name
+                        FROM information_schema.table_constraints
+                        WHERE table_name = 'person' AND constraint_type = 'UNIQUE';
+                    """)
+                    unique_constraint_exists = cursor.fetchone()
+                    if not unique_constraint_exists:
+                        cursor.execute("""
+                            ALTER TABLE Person
+                            ADD CONSTRAINT unique_user_name UNIQUE (user_id, name);
+                        """)
+                        logger.info("Added unique constraint to Person table (user_id, name).")
+
 
                 # Check and create the Gift table
                 cursor.execute("""
@@ -192,7 +278,7 @@ class DatabasePersistence:
                         CREATE TABLE Gift (
                             id SERIAL PRIMARY KEY,
                             person_id INTEGER NOT NULL REFERENCES Person(id) ON DELETE CASCADE,
-                            gift VARCHAR(50) NOT NULL
+                            gift VARCHAR(100) NOT NULL
                         );
                     """)
                     logger.info("Created table: Gift")
@@ -216,3 +302,4 @@ class DatabasePersistence:
                         );
                     """)
                     logger.info("Created table: Users")
+                conn.commit()

@@ -1,3 +1,5 @@
+<!-- search.html -->
+
 {% extends "layout.html" %}
 
 {% block content %}
@@ -18,13 +20,33 @@
         <li>
           <h4><a href="{{ url_for('person', id=result.id) }}">{{ result.name }}</a></h4>
           <ul>
-          {% for item in result.items_lst %}
-            <li>{{ item }}</li>
-          {% endfor %}
+            {% for item in result.paginated_gifts %}
+              <li>{{ item }}</li>
+            {% endfor %}
           </ul>
         </li>
       {% endfor %}
     </ul>
+
+    {% if total_pages > 1 %}
+    <div class="pagination">
+      {% if page > 1 %}
+        <a href="{{ url_for('search', query=query, page=page - 1) }}">Previous</a>
+      {% endif %}
+
+      {% for i in range(1, total_pages + 1) %}
+        {% if i == page %}
+          <span class="current">{{ i }}</span>
+        {% else %}
+          <a href="{{ url_for('search', query=query, page=i) }}">{{ i }}</a>
+        {% endif %}
+      {% endfor %}
+
+      {% if page < total_pages %}
+        <a href="{{ url_for('search', query=query, page=page + 1) }}">Next</a>
+      {% endif %}
+    </div>
+    {% endif %}
   {% endif %}
 {% endif %}
 

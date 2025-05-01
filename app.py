@@ -1,3 +1,4 @@
+# app.py
 import secrets
 import os
 from flask import (
@@ -9,42 +10,65 @@ from flask import (
     request,
     session,
     url_for,
+    abort,
 )
 from werkzeug.security import check_password_hash
+import math
 
 from helpers.utils import parse_gift_list, sort_gifts, sort_names
 from helpers.database_persistence import DatabasePersistence
 
 app = Flask(__name__)
 app.secret_key = secrets.token_hex(32)
+GIFTS_PER_PAGE = 10  # Define the number of gifts per page
+LINES_PER_PAGE = 15  # Define the number of lines (results + gifts) per page
 
 @app.before_request
 def load_db_and_user():
     g.storage = DatabasePersistence()
     g.user_id = session.get('user_id')
 
-@app.route("/")
-def home():
+@app.route("/", defaults={'page': 1})
+@app.route("/page/<int:page>")
+def home(page):
     if not g.user_id:
         return redirect(url_for('login'))
-    people_gift_list = g.storage.get_all_people(g.user_id)
-    sorted_people = sort_names(people_gift_list)
-    return render_template('home.html', people=sorted_people)
 
-@app.route("/<int:id>")
-def person(id):
+    total_people = g.storage.get_person_count(g.user_id)
+    per_page = g.storage.ITEMS_PER_PAGE
+    total_pages = math.ceil(total_people / per_page)
+
+    if page < 1 or page > total_pages if total_pages > 0 else page != 1:
+        abort(404)
+
+    people = g.storage.get_paginated_people(g.user_id, page)
+    sorted_people = sort_names(people)
+
+    return render_template('home.html', people=sorted_people, page=page, total_pages=total_pages)
+
+@app.route("/<int:id>", defaults={'gift_page': 1})
+@app.route("/<int:id>/gifts/page/<int:gift_page>")
+def person(id, gift_page):
     if not g.user_id:
         return redirect(url_for('login'))
-    person = g.storage.find_person(id, g.user_id)
-    if not person:
+    person_data = g.storage.find_person_with_gifts(id, g.user_id, gift_page, GIFTS_PER_PAGE)
+    if not person_data:
         flash("Person not found.", "error")
         return redirect(url_for('home'))
 
+    total_gifts = g.storage.get_gift_count(id)
+    total_gift_pages = math.ceil(total_gifts / GIFTS_PER_PAGE) if GIFTS_PER_PAGE > 0 else 1
+
+    if gift_page < 1 or gift_page > total_gift_pages if total_gift_pages > 0 else gift_page != 1:
+        abort(404)
+
     return render_template(
         'name.html',
-        name=person['name'],
-        gift_lst=person['gift_lst'],
-        id=person['id'],
+        name=person_data.get('name'),
+        gift_lst=person_data.get('paginated_gifts', []),
+        id=person_data.get('id'),
+        gift_page=gift_page,
+        total_gift_pages=total_gift_pages
     )
 
 @app.route("/add_person", methods=["GET", "POST"])
@@ -73,7 +97,9 @@ def add_person():
 def edit_person(id):
     if not g.user_id:
         return redirect(url_for('login'))
-    person = g.storage.find_person(id, g.user_id)
+    
+    # Use find_person_with_gifts to retrieve the person and their gifts
+    person = g.storage.find_person_with_gifts(id, g.user_id, page=1, gifts_per_page=100)  # Adjust gifts_per_page as needed
 
     if not person:
         flash("Person not found.", "error")
@@ -107,13 +133,31 @@ def delete_person(id):
     flash(f"{person['name']} has been deleted.", "success")
     return redirect(url_for('home'))
 
-@app.route("/search")
-def search():
+@app.route("/search", defaults={'page': 1})
+@app.route("/search/page/<int:page>")
+def search(page):
     if not g.user_id:
         return redirect(url_for('login'))
+    
     query = request.args.get('query', '')
-    results = g.storage.search_matching(query, g.user_id)
-    return render_template('search.html', query=query, results=results)
+    total_results = g.storage.get_search_result_count(query, g.user_id)
+    per_page = LINES_PER_PAGE
+    total_pages = math.ceil(total_results / per_page)
+
+    if page < 1 or page > total_pages if total_pages > 0 else page != 1:
+        abort(404)
+
+    # Use the correct method: search_matching_with_gifts
+    results_data = g.storage.search_matching_with_gifts(
+        query_str=query,
+        user_id=g.user_id,
+        page=page,
+        gifts_per_page=LINES_PER_PAGE,  # Limit gifts per page to 15 lines
+        gift_page=1  # Default to the first page of gifts
+    )
+
+    results = results_data.get('results', [])
+    return render_template('search.html', query=query, results=results, page=page, total_pages=total_pages)
 
 @app.route("/register", methods=["GET", "POST"])
 def register():
