@@ -37,8 +37,8 @@ def home(page):
     per_page = g.storage.ITEMS_PER_PAGE
     total_pages = math.ceil(total_people / per_page)
 
-    if page < 1 or page > total_pages if total_pages > 0 else page != 1:
-        abort(404)
+    if page < 1 or (total_pages > 0 and page > total_pages):
+        return redirect(url_for('home', page=1))
 
     people = g.storage.get_paginated_people(g.user_id, page)
     sorted_people = sort_names(people)
@@ -58,8 +58,8 @@ def person(id, gift_page):
     total_gifts = g.storage.get_gift_count(id)
     total_gift_pages = math.ceil(total_gifts / GIFTS_PER_PAGE) if GIFTS_PER_PAGE > 0 else 1
 
-    if gift_page < 1 or gift_page > total_gift_pages if total_gift_pages > 0 else gift_page != 1:
-        abort(404)
+    if gift_page < 1 or (total_gift_pages > 0 and gift_page > total_gift_pages):
+        return redirect(url_for('person', id=id, gift_page=1))
 
     return render_template(
         'name.html',
@@ -151,8 +151,8 @@ def search(page):
     total_gifts = sum(len(result['paginated_gifts']) for result in results)
     total_pages = math.ceil(total_gifts / gifts_per_page)
 
-    if page < 1 or page > total_pages if total_pages > 0 else page != 1:
-        abort(404)
+    if page < 1 or (total_pages > 0 and page > total_pages):
+        return redirect(url_for('search', page=1, query=query))
 
     # Paginate the gifts
     start_index = (page - 1) * gifts_per_page
