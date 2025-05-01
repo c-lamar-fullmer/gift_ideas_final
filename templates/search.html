@@ -27,6 +27,26 @@
         </li>
       {% endfor %}
     </ul>
+
+    {% if total_pages > 1 %}
+    <div class="pagination">
+      {% if page > 1 %}
+        <a href="{{ url_for('search', page=page - 1, query=query) }}">Previous</a>
+      {% endif %}
+
+      {% for i in range(1, total_pages + 1) %}
+        {% if i == page %}
+          <span class="current">{{ i }}</span>
+        {% else %}
+          <a href="{{ url_for('search', page=i, query=query) }}">{{ i }}</a>
+        {% endif %}
+      {% endfor %}
+
+      {% if page < total_pages %}
+        <a href="{{ url_for('search', page=page + 1, query=query) }}">Next</a>
+      {% endif %}
+    </div>
+    {% endif %}
   {% endif %}
 {% endif %}
 

@@ -20,7 +20,7 @@ from helpers.database_persistence import DatabasePersistence
 
 app = Flask(__name__)
 app.secret_key = secrets.token_hex(32)
-GIFTS_PER_PAGE = 10 
+GIFTS_PER_PAGE = 8
 
 @app.before_request
 def load_db_and_user():
@@ -132,12 +132,14 @@ def delete_person(id):
     flash(f"{person['name']} has been deleted.", "success")
     return redirect(url_for('home'))
 
-@app.route("/search")
-def search():
+@app.route("/search", defaults={'page': 1})
+@app.route("/search/page/<int:page>")
+def search(page):
     if not g.user_id:
         return redirect(url_for('login'))
     
     query = request.args.get('query', '')
+    gifts_per_page = GIFTS_PER_PAGE
 
     # Fetch all matching results
     results_data = g.storage.search_matching_with_gifts(
@@ -146,10 +148,38 @@ def search():
     )
 
     results = results_data.get('results', [])
+    total_gifts = sum(len(result['paginated_gifts']) for result in results)
+    total_pages = math.ceil(total_gifts / gifts_per_page)
+
+    if page < 1 or page > total_pages if total_pages > 0 else page != 1:
+        abort(404)
+
+    # Paginate the gifts
+    start_index = (page - 1) * gifts_per_page
+    end_index = start_index + gifts_per_page
+    paginated_results = []
+    current_count = 0
+
+    for result in results:
+        gifts = result['paginated_gifts']
+        if current_count + len(gifts) > start_index:
+            start = max(0, start_index - current_count)
+            end = min(len(gifts), end_index - current_count)
+            paginated_results.append({
+                'id': result['id'],
+                'name': result['name'],
+                'paginated_gifts': gifts[start:end]
+            })
+        current_count += len(gifts)
+        if current_count >= end_index:
+            break
+
     return render_template(
         'search.html',
         query=query,
-        results=results
+        results=paginated_results,
+        page=page,
+        total_pages=total_pages
     )
 
 @app.route("/register", methods=["GET", "POST"])
