@@ -20,8 +20,7 @@ from helpers.database_persistence import DatabasePersistence
 
 app = Flask(__name__)
 app.secret_key = secrets.token_hex(32)
-GIFTS_PER_PAGE = 10  # Define the number of gifts per page
-LINES_PER_PAGE = 15  # Define the number of lines (results + gifts) per page
+GIFTS_PER_PAGE = 10 
 
 @app.before_request
 def load_db_and_user():
