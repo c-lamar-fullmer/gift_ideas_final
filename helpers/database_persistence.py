@@ -158,43 +158,42 @@ class DatabasePersistence:
         query = "DELETE FROM Person WHERE id = %s AND user_id = %s"
         self._execute_none(query, (person_id, user_id))
 
-    def search_matching_with_gifts(self, query_str, user_id, page, gifts_per_page, gift_page):
-        offset_people = (page - 1) * self.ITEMS_PER_PAGE
-        offset_gifts = (gift_page - 1) * gifts_per_page
-        search_query = """
-            SELECT
-                P.id,
-                P.name,
-                (SELECT COUNT(G2.gift) FROM Gift G2 WHERE G2.person_id = P.id AND LOWER(G2.gift) LIKE %s) AS total_gifts,
-                ARRAY_AGG(G.gift ORDER BY G.id) AS all_gifts
+    def search_matching_with_gifts(self, query_str, user_id):
+        query = """
+            SELECT P.id AS person_id, P.name AS person_name, G.gift
             FROM Person P
-            JOIN Gift G ON P.id = G.person_id
-            WHERE LOWER(G.gift) LIKE %s AND P.user_id = %s
-            GROUP BY P.id, P.name
-            ORDER BY P.name
-            LIMIT %s OFFSET %s;
+            LEFT JOIN Gift G ON P.id = G.person_id
+            WHERE P.user_id = %s AND (P.name ILIKE %s OR G.gift ILIKE %s)
+            ORDER BY P.name, G.id;
         """
-        results = self._execute_query(search_query, (f"%{query_str.lower()}%", f"%{query_str.lower()}%", user_id, self.ITEMS_PER_PAGE, offset_people))
-        processed_results = []
-        for result in results:
-            # Convert result to a standard dictionary
-            result = dict(result)
-            all_gifts = result.get('all_gifts', [])
-            # Filter gifts to include only those matching the query
-            matching_gifts = [gift for gift in all_gifts if query_str.lower() in gift.lower()]
-            paginated_gifts = matching_gifts[offset_gifts:offset_gifts + gifts_per_page]
-            result['paginated_gifts'] = paginated_gifts
-            processed_results.append(result)
-        return {'results': processed_results}
+        results = self._execute_query(query, (user_id, f"%{query_str}%", f"%{query_str}%"))
+        
+        # Group results by person
+        grouped_results = {}
+        for row in results:
+            person_id = row['person_id']
+            if person_id not in grouped_results:
+                grouped_results[person_id] = {
+                    'id': person_id,
+                    'name': row['person_name'],
+                    'paginated_gifts': []
+                }
+            if row['gift']:
+                grouped_results[person_id]['paginated_gifts'].append(row['gift'])
+
+        return {'results': list(grouped_results.values())}
 
     def get_search_result_count(self, query, user_id):
-        search_query = """
-            SELECT COUNT(DISTINCT P.id)
-            FROM Person P
-            JOIN Gift G ON P.id = G.person_id
-            WHERE LOWER(G.gift) LIKE %s AND P.user_id = %s;
+        query = """
+            SELECT COUNT(*)
+            FROM (
+                SELECT P.id AS person_id, G.id AS gift_id
+                FROM Person P
+                LEFT JOIN Gift G ON P.id = G.person_id
+                WHERE P.user_id = %s AND (P.name ILIKE %s OR G.gift ILIKE %s)
+            ) AS subquery;
         """
-        result = self._execute_one(search_query, (f"%{query.lower()}%", user_id))
+        result = self._execute_one(query, (user_id, f"%{query}%", f"%{query}%"))
         return result['count'] if result else 0
 
     def create_user(self, username, password):

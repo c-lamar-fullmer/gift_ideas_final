@@ -133,31 +133,25 @@ def delete_person(id):
     flash(f"{person['name']} has been deleted.", "success")
     return redirect(url_for('home'))
 
-@app.route("/search", defaults={'page': 1})
-@app.route("/search/page/<int:page>")
-def search(page):
+@app.route("/search")
+def search():
     if not g.user_id:
         return redirect(url_for('login'))
     
     query = request.args.get('query', '')
-    total_results = g.storage.get_search_result_count(query, g.user_id)
-    per_page = LINES_PER_PAGE
-    total_pages = math.ceil(total_results / per_page)
 
-    if page < 1 or page > total_pages if total_pages > 0 else page != 1:
-        abort(404)
-
-    # Use the correct method: search_matching_with_gifts
+    # Fetch all matching results
     results_data = g.storage.search_matching_with_gifts(
         query_str=query,
         user_id=g.user_id,
-        page=page,
-        gifts_per_page=LINES_PER_PAGE,  # Limit gifts per page to 15 lines
-        gift_page=1  # Default to the first page of gifts
     )
 
     results = results_data.get('results', [])
-    return render_template('search.html', query=query, results=results, page=page, total_pages=total_pages)
+    return render_template(
+        'search.html',
+        query=query,
+        results=results
+    )
 
 @app.route("/register", methods=["GET", "POST"])
 def register():
