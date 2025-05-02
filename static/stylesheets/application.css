@@ -114,26 +114,28 @@ header {
 
 /* Navigation styling */
 .navigation {
-    margin-top: 20px;
-    padding: 15px;
+    display: flex; /* Arrange items in a row */
+    gap: 10px; /* Add space between links */
+    justify-content: center; /* Center the links horizontally */
+    margin-top: 20px; /* Add space above the navigation */
+    padding: 15px; /* Add padding inside the navigation */
     background-color: #eaeaea; /* Light gray background */
     border-radius: 5px; /* Rounded corners */
-    text-align: center; /* Center-align links */
-}
-
-.navigation p {
-    margin: 10px 0; /* Spacing between links */
 }
 
 .navigation a {
     font-weight: bold; /* Bold links */
     color: #2c3e50; /* Dark blue-gray color */
     text-decoration: none; /* Remove underline */
+    padding: 10px 15px; /* Add padding to make links look like buttons */
+    border-radius: 5px; /* Rounded corners for button-like appearance */
+    background-color: #f9f9f9; /* Light background for links */
+    transition: background-color 0.3s ease; /* Smooth hover effect */
 }
 
 .navigation a:hover {
-    text-decoration: underline; /* Add underline on hover */
-    color: #3498db; /* Bright blue hover color */
+    background-color: #3498db; /* Bright blue background on hover */
+    color: white; /* White text on hover */
 }
 
 ul {
