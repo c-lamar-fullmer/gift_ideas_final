@@ -1,48 +1,50 @@
 <!-- search.html -->
 
-{% extends "layout.html" %}
+{% extends "layout.html" %} <!-- This template extends the base layout.html file -->
 
 {% block content %}
-<h2>Search</h2>
+<h2>Search</h2> <!-- Page header for the search functionality -->
 
+<!-- Search form -->
 <form action="{{ url_for('search') }}" method="get">
-  <input name="query" value="{{ query }}" />
-  <button type="submit">Search</button>
+  <input name="query" value="{{ query }}" /> <!-- Input field for the search query -->
+  <button type="submit">Search</button> <!-- Submit button to perform the search -->
 </form>
 
-{% if query %}
-  {% if results | length == 0 %}
-    <p>Sorry, no matches were found.</p>
+{% if query %} <!-- Check if a search query was submitted -->
+  {% if results | length == 0 %} <!-- Check if there are no results -->
+    <p>Sorry, no matches were found.</p> <!-- Message displayed if no results are found -->
   {% else %}
-    <h2>Results for '{{ query }}'</h2>
+    <h2>Results for '{{ query }}'</h2> <!-- Display the search query -->
     <ul>
-      {% for result in results %}
+      {% for result in results %} <!-- Loop through the search results -->
         <li>
           <h4><a href="{{ url_for('person', id=result.id) }}">{{ result.name }}</a></h4>
+          <!-- Link to the details page for each person in the search results -->
           <ul>
-            {% for item in result.paginated_gifts %}
-              <li>{{ item }}</li>
+            {% for item in result.paginated_gifts %} <!-- Loop through the paginated gift ideas for each person -->
+              <li>{{ item }}</li> <!-- Display each gift idea as a list item -->
             {% endfor %}
           </ul>
         </li>
       {% endfor %}
     </ul>
 
-    {% if total_pages > 1 %}
+    {% if total_pages > 1 %} <!-- Check if pagination is needed -->
     <div class="pagination">
-      {% if page > 1 %}
+      {% if page > 1 %} <!-- Show the "Previous" link if not on the first page -->
         <a href="{{ url_for('search', page=page - 1, query=query) }}">Previous</a>
       {% endif %}
 
-      {% for i in range(1, total_pages + 1) %}
-        {% if i == page %}
+      {% for i in range(1, total_pages + 1) %} <!-- Loop through all pages -->
+        {% if i == page %} <!-- Highlight the current page -->
           <span class="current">{{ i }}</span>
-        {% else %}
+        {% else %} <!-- Link to other pages -->
           <a href="{{ url_for('search', page=i, query=query) }}">{{ i }}</a>
         {% endif %}
       {% endfor %}
 
-      {% if page < total_pages %}
+      {% if page < total_pages %} <!-- Show the "Next" link if not on the last page -->
         <a href="{{ url_for('search', page=page + 1, query=query) }}">Next</a>
       {% endif %}
     </div>

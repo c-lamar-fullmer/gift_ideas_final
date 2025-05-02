@@ -1,41 +1,47 @@
 <!-- home.html -->
 
-{% extends "layout.html" %}
+{% extends "layout.html" %} <!-- This template extends the base layout.html file -->
 
 {% block content %}
-  {% if g.user_id %}
+  {% if g.user_id %} <!-- Check if the user is logged in -->
     <h2>Welcome to your Gift Ideas List!</h2>
-    {% if people | length > 0 %}
+    
+    {% if people | length > 0 %} <!-- Check if there are any people in the list -->
       <p>Here are the people and their gift ideas:</p>
       <ul>
-        {% for person in people %}
-          <li><a href="{{ url_for('person', id=person.id) }}">{{ person.name }}</a></li>
+        {% for person in people %} <!-- Loop through the list of people -->
+          <li>
+            <a href="{{ url_for('person', id=person.id) }}">{{ person.name }}</a>
+            <!-- Link to the details page for each person -->
+          </li>
         {% endfor %}
       </ul>
 
-      {% if total_pages > 1 %}
+      {% if total_pages > 1 %} <!-- Check if pagination is needed -->
       <div class="pagination">
-        {% if page > 1 %}
+        {% if page > 1 %} <!-- Show the "Previous" link if not on the first page -->
           <a href="{{ url_for('home', page=page - 1) }}">Previous</a>
         {% endif %}
 
-        {% for i in range(1, total_pages + 1) %}
-          {% if i == page %}
+        {% for i in range(1, total_pages + 1) %} <!-- Loop through all pages -->
+          {% if i == page %} <!-- Highlight the current page -->
             <span class="current">{{ i }}</span>
-          {% else %}
+          {% else %} <!-- Link to other pages -->
             <a href="{{ url_for('home', page=i) }}">{{ i }}</a>
           {% endif %}
         {% endfor %}
 
-        {% if page < total_pages %}
+        {% if page < total_pages %} <!-- Show the "Next" link if not on the last page -->
           <a href="{{ url_for('home', page=page + 1) }}">Next</a>
         {% endif %}
       </div>
       {% endif %}
     {% else %}
+      <!-- Message shown if there are no people in the list -->
       <p>You don't have any people. <a href="{{ url_for('add_person') }}">Add a new person</a> to start brainstorming gift ideas!</p>
     {% endif %}
   {% else %}
+    <!-- Message shown if the user is not logged in -->
     <h2>Welcome to the Gift Ideas List!</h2>
     <p>Please <a href="{{ url_for('login') }}">log in</a> or <a href="{{ url_for('register') }}">register</a> to view and manage your gift ideas.</p>
   {% endif %}

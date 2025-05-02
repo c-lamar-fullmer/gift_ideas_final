@@ -1,33 +1,43 @@
 <!-- login.html -->
 
-{% extends "layout.html" %}
+{% extends "layout.html" %} <!-- This template extends the base layout.html file -->
 
 {% block content %}
 <section id="authentication">
     <header>
-        <h2>Login</h2>
+        <h2>Login</h2> <!-- Page header for the login form -->
     </header>
 </section>
 
 <div>
+    <!-- Form to handle user login -->
     <form action="{{ url_for('login') }}" method="post">
         <dl>
+            <!-- Input field for the username -->
             <dt>
                 <label for="username">Username:</label>
             </dt>
             <dd>
-                <input type="text" name="username" value="{{ request.form['username'] if request.form else '' }}" size="50" required>
+                <input type="text" name="username" 
+                       value="{{ request.form['username'] if request.form else '' }}" 
+                       size="50" required>
+                <!-- Pre-fills the username field with the previously entered value if the form was submitted -->
             </dd>
 
+            <!-- Input field for the password -->
             <dt>
                 <label for="password">Password:</label>
             </dt>
             <dd>
                 <input type="password" name="password" size="50" required>
+                <!-- Password field does not pre-fill for security reasons -->
             </dd>
         </dl>
         <fieldset>
+            <!-- Submit button to log in -->
             <input type="submit" value="Login">
+            
+            <!-- Link to the registration page for users without an account -->
             <a href="{{ url_for('register') }}">Don't have an account? Register</a>
         </fieldset>
     </form>

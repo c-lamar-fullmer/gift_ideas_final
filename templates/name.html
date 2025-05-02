@@ -1,38 +1,39 @@
 <!-- name.html -->
-{% extends "layout.html" %}
+
+{% extends "layout.html" %} <!-- This template extends the base layout.html file -->
 
 {% block content %}
-<h2>{{ name }}</h2>
+<h2>{{ name }}</h2> <!-- Display the name of the person -->
 
 <div>
   <ul>
-    {% for item in gift_lst %}
-      <li>{{ item }}</li>
+    {% for item in gift_lst %} <!-- Loop through the list of gift ideas -->
+      <li>{{ item }}</li> <!-- Display each gift idea as a list item -->
     {% endfor %}
   </ul>
 </div>
 
-{% if total_gift_pages > 1 %}
+{% if total_gift_pages > 1 %} <!-- Check if pagination is needed for the gift list -->
 <div class="pagination">
-  {% if gift_page > 1 %}
+  {% if gift_page > 1 %} <!-- Show the "Previous" link if not on the first page -->
     <a href="{{ url_for('person', id=id, gift_page=gift_page - 1) }}">Previous</a>
   {% endif %}
 
-  {% for i in range(1, total_gift_pages + 1) %}
-    {% if i == gift_page %}
+  {% for i in range(1, total_gift_pages + 1) %} <!-- Loop through all gift pages -->
+    {% if i == gift_page %} <!-- Highlight the current page -->
       <span class="current">{{ i }}</span>
-    {% else %}
+    {% else %} <!-- Link to other pages -->
       <a href="{{ url_for('person', id=id, gift_page=i) }}">{{ i }}</a>
     {% endif %}
   {% endfor %}
 
-  {% if gift_page < total_gift_pages %}
+  {% if gift_page < total_gift_pages %} <!-- Show the "Next" link if not on the last page -->
     <a href="{{ url_for('person', id=id, gift_page=gift_page + 1) }}">Next</a>
   {% endif %}
 </div>
 {% endif %}
 
 <div>
-  <p><a href="{{ url_for('edit_person', id=id) }}">Edit List</a></p>
+  <p><a href="{{ url_for('edit_person', id=id) }}">Edit List</a></p> <!-- Link to edit the person's gift list -->
 </div>
 {% endblock %}

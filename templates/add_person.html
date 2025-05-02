@@ -1,34 +1,40 @@
 <!-- add_person.html -->
 
-{% extends "layout.html" %}
+{% extends "layout.html" %} <!-- This template extends the base layout.html file -->
 
 {% block content %}
 <section id="todos">
     <header>
-        <h2>Add a New Person</h2>
+        <h2>Add a New Person</h2> <!-- Page header -->
     </header>
 </section>
 
 <div>
-<form action="{{ url_for('add_person') }}" method="post">
+<form action="{{ url_for('add_person') }}" method="post"> <!-- Form to add a new person -->
     <dl>
+        <!-- Input field for the person's name -->
         <dt>
             <label for="name">Enter the Name:</label>
         </dt>
         <dd>
             <input type="text" name="name" placeholder="Name" value="{{ name }}" size="50">
+            <!-- The 'value' attribute pre-fills the input field with the current value of 'name' if available -->
         </dd>
 
+        <!-- Textarea for entering gift ideas -->
         <dt>
             <label for="gifts">Enter your gift ideas, one line at a time:</label>
         </dt>
         <dd>
-            <textarea name="gifts" placeholder="Add your list here" rows="10" 
-            cols="50">{{ gift_lst }}</textarea>
+            <textarea name="gifts" placeholder="Add your list here" rows="10" cols="50">{{ gift_lst }}</textarea>
+            <!-- The 'gift_lst' variable pre-fills the textarea with existing gift ideas if available -->
         </dd>
     </dl>
     <fieldset>
+        <!-- Submit button to save the new person and their gift ideas -->
         <input type="submit" value="Save">
+        
+        <!-- Cancel button to return to the home page without saving -->
         <a href="{{ url_for('home') }}">Cancel</a>
     </fieldset>
 </form>
