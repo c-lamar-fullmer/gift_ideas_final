@@ -1,26 +1,27 @@
 /* General body styling */
 body {
-    font-family: Arial, sans-serif; /* Use a clean, readable font */
-    margin: 20px; /* Add space around the page */
-    line-height: 1.6; /* Improve readability with consistent line spacing */
-    background-color: #f4f4f9; /* Soft background color for a clean look */
-    color: #333; /* Dark text for contrast */
+    font-family: Arial, sans-serif;
+    margin: 20px; /* space around the page */
+    line-height: 1.6; /* line spacing */
+    background-color: #f4f4f9;
+    color: #333;
 }
 
 /* Headings */
 h2 {
-    color: #2c3e50; /* Deep blue-gray color for headings */
-    margin-bottom: 15px; /* Add space below headings */
+    color: #2c3e50;
+    margin-bottom: 15px; /* space below headings */
 }
 
 /* Links */
 a {
-    color: #3498db; /* Bright blue for links */
-    text-decoration: none; /* Remove underline for a cleaner look */
+    color: #3498db;
+    text-decoration: none; /* Remove underline */
 }
 
+/* Hover */
 a:hover {
-    text-decoration: underline; /* Add underline on hover for clarity */
+    text-decoration: underline; /* Add underline on hover */
 }
 
 /* Lists */
@@ -30,64 +31,64 @@ ul {
 }
 
 ul li {
-    padding: 5px 0; /* Add spacing between list items */
+    padding: 5px 0; /* Add space between list items */
 }
 
 /* Buttons and inputs */
 input[type="submit"], button {
-    background-color: #3498db; /* Bright blue background */
-    color: white; /* White text for contrast */
-    border: none; /* Remove default border */
-    padding: 8px 15px; /* Add padding for a button-like appearance */
+    background-color: #3498db;
+    color: white; /* text */
+    border: none; /* Remove border */
+    padding: 8px 15px; /* Add padding */
     cursor: pointer; /* Change cursor to pointer on hover */
-    border-radius: 5px; /* Rounded corners for a modern look */
+    border-radius: 5px; /* Rounded corners */
 }
 
 input[type="submit"]:hover, button:hover {
-    background-color: #2980b9; /* Darker blue on hover */
+    background-color: #2980b9;
 }
 
 /* Flash messages */
 .flash {
-    margin: 15px 0; /* Add space above and below flash messages */
-    padding: 10px; /* Add padding inside the flash message box */
-    border-radius: 5px; /* Rounded corners for a clean look */
+    margin: 15px 0; /* space above and below flash messages */
+    padding: 10px; /* padding inside the flash message box */
+    border-radius: 5px; /* Rounded corners */
 }
 
 .flash.success {
-    background-color: #dff0d8; /* Green background for success messages */
-    color: #3c763d; /* Dark green text for success messages */
+    background-color: #dff0d8;
+    color: #3c763d;
 }
 
 .flash.error {
-    background-color: #f2dede; /* Red background for error messages */
-    color: #a94442; /* Dark red text for error messages */
+    background-color: #f2dede;
+    color: #a94442;
 }
 
 /* Form styling */
 form {
-    margin-bottom: 20px; /* Add space below forms */
+    margin-bottom: 20px; /* space below forms */
 }
 
 form dl {
-    margin: 10px 0; /* Add spacing between form elements */
+    margin: 10px 0; /* space between form elements */
 }
 
 form dt {
-    font-weight: bold; /* Bold labels for clarity */
+    font-weight: bold;
 }
 
 form dd {
-    margin: 5px 0; /* Add spacing below labels */
+    margin: 5px 0; /* space below labels */
 }
 
 /* Text inputs and textareas */
 input[type="text"], textarea {
-    width: 100%; /* Make inputs and textareas full width */
-    padding: 8px; /* Add padding inside the input fields */
-    margin-bottom: 10px; /* Add space below inputs */
-    border: 1px solid #ccc; /* Light gray border */
-    border-radius: 5px; /* Rounded corners for a modern look */
+    width: 100%; /* inputs and textareas (full width) */
+    padding: 8px; /* padding inside the input fields */
+    margin-bottom: 10px; /* space below inputs */
+    border: 1px solid #ccc;
+    border-radius: 5px; /* Rounded corners */
     box-sizing: border-box; /* Include padding and border in the element's width */
 }
 
@@ -98,69 +99,70 @@ textarea {
 /* Fieldset styling */
 fieldset {
     border: none; /* Remove default border */
-    margin: 10px 0; /* Add spacing between fieldsets */
+    margin: 10px 0; /* space between fieldsets */
 }
 
 /* Page sections */
 section#todos {
-    margin-bottom: 20px; /* Add space below the section */
+    margin-bottom: 20px; /* space below the section */
 }
 
 header {
-    border-bottom: 1px solid #ccc; /* Add a light gray border below the header */
-    margin-bottom: 15px; /* Add space below the header */
-    padding-bottom: 5px; /* Add padding inside the header */
+    border-bottom: 1px solid #ccc; /* border below the header */
+    margin-bottom: 15px; /* space below the header */
+    padding-bottom: 5px; /* padding inside the header */
 }
 
 /* Navigation styling */
 .navigation {
     display: flex; /* Arrange navigation links in a row */
-    gap: 10px; /* Add space between navigation links */
-    justify-content: center; /* Center the navigation links */
-    margin-top: 20px; /* Add space above the navigation */
-    padding: 15px; /* Add padding inside the navigation */
-    background-color: #eaeaea; /* Light gray background for navigation */
-    border-radius: 5px; /* Rounded corners for a clean look */
+    gap: 10px; /* space between navigation links */
+    justify-content: center;
+    margin-top: 20px; /* space above */
+    padding: 15px; /* padding inside */
+    background-color: #eaeaea;
+    border-radius: 5px; /* Rounded corners */
 }
 
 .navigation a {
-    font-weight: bold; /* Bold navigation links */
-    color: #2c3e50; /* Dark blue-gray color for links */
-    text-decoration: none; /* Remove underline for a cleaner look */
-    padding: 10px 15px; /* Add padding to make links look like buttons */
-    border-radius: 5px; /* Rounded corners for button-like appearance */
-    background-color: #f9f9f9; /* Light background for links */
+    font-weight: bold;
+    color: #2c3e50;
+    text-decoration: none; /* Remove underline */
+    padding: 10px 15px;
+    border-radius: 5px; /* Rounded corners */
+    background-color: #f9f9f9;
     transition: background-color 0.3s ease; /* Smooth hover effect */
 }
 
 .navigation a:hover {
-    background-color: #3498db; /* Bright blue background on hover */
-    color: white; /* White text on hover */
+    background-color: #3498db;
+    color: white; /* text on hover */
 }
 
 /* Pagination styling */
 .pagination {
-    margin-top: 20px; /* Add space above the pagination controls */
-    text-align: center; /* Center the pagination controls */
+    margin-top: 20px; /* space above the pagination controls */
+    text-align: center;
 }
 
 .pagination a, .pagination span {
     display: inline-block; /* Arrange pagination links and spans in a row */
-    padding: 8px 12px; /* Add padding inside the links and spans */
-    margin: 0 5px; /* Add space between pagination controls */
-    border: 1px solid #ccc; /* Light gray border */
+    padding: 8px 12px; /* padding inside the links and spans */
+    margin: 0 5px; /* space between pagination controls */
+    border: 1px solid #ccc;
     text-decoration: none; /* Remove underline from links */
-    border-radius: 5px; /* Rounded corners for a clean look */
-    background-color: #f9f9f9; /* Light background color */
-    color: #333; /* Dark text color */
+    border-radius: 5px; /* Rounded corners */
+    background-color: #f9f9f9;
+    color: #333; /* text color */
 }
 
 .pagination a:hover {
-    background-color: #eee; /* Slightly darker background on hover */
+    background-color: #eee; /* background on hover */
 }
 
+/* current pagination page styling */
 .pagination .current {
-    background-color: #3498db; /* Blue background for the current page */
-    color: white; /* White text for the current page */
-    border-color: #3498db; /* Blue border for the current page */
+    background-color: #3498db;
+    color: white;
+    border-color: #3498db;
 }

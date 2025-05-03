@@ -1,11 +1,11 @@
 <!-- register.html -->
 
-{% extends "layout.html" %} <!-- This template extends the base layout.html file -->
+{% extends "layout.html" %}
 
 {% block content %}
 <section id="authentication">
     <header>
-        <h2>Register</h2> <!-- Page header for the registration form -->
+        <h2>Register</h2>
     </header>
 </section>
 
@@ -13,40 +13,38 @@
     <!-- Form to handle user registration -->
     <form action="{{ url_for('register') }}" method="post">
         <dl>
-            <!-- Input field for the username -->
             <dt>
+                <!-- Input for the username -->
                 <label for="username">Username:</label>
             </dt>
             <dd>
                 <input type="text" name="username" 
                        value="{{ request.form['username'] if request.form else '' }}" 
                        size="50" required>
-                <!-- Pre-fills the username field with the previously entered value if the form was submitted -->
             </dd>
 
-            <!-- Input field for the password -->
             <dt>
+                <!-- Input for the password -->
                 <label for="password">Password:</label>
             </dt>
             <dd>
                 <input type="password" name="password" size="50" required>
-                <!-- Password field does not pre-fill for security reasons -->
             </dd>
 
-            <!-- Input field to confirm the password -->
+            <!-- confirm the password -->
             <dt>
                 <label for="confirm_password">Confirm Password:</label>
             </dt>
             <dd>
+                <!-- Makes sure user confirms their password -->
                 <input type="password" name="confirm_password" size="50" required>
-                <!-- Ensures the user confirms their password -->
             </dd>
         </dl>
         <fieldset>
-            <!-- Submit button to register the user -->
+            <!-- Submit button to register user -->
             <input type="submit" value="Register">
             
-            <!-- Link to the login page for users who already have an account -->
+            <!-- Link to the login page -->
             <a href="{{ url_for('login') }}">Already have an account? Login</a>
         </fieldset>
     </form>

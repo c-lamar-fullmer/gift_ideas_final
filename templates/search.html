@@ -1,50 +1,64 @@
 <!-- search.html -->
 
-{% extends "layout.html" %} <!-- This template extends the base layout.html file -->
+{% extends "layout.html" %}
 
 {% block content %}
-<h2>Search</h2> <!-- Page header for the search functionality -->
+<h2>Search</h2>
 
 <!-- Search form -->
 <form action="{{ url_for('search') }}" method="get">
-  <input name="query" value="{{ query }}" /> <!-- Input field for the search query -->
-  <button type="submit">Search</button> <!-- Submit button to perform the search -->
+  <!-- Input for the search query -->
+  <input name="query" value="{{ query }}" />
+  <!-- Submit button -->
+  <button type="submit">Search</button>
 </form>
 
-{% if query %} <!-- Check if a search query was submitted -->
-  {% if results | length == 0 %} <!-- Check if there are no results -->
-    <p>Sorry, no matches were found.</p> <!-- Message displayed if no results are found -->
+<!-- Check if a search query was submitted -->
+{% if query %}
+  <!-- Check if there are no results -->
+  {% if results | length == 0 %}
+    <!-- Message displayed if no results are found -->
+    <p>Sorry, no matches were found.</p>
   {% else %}
-    <h2>Results for '{{ query }}'</h2> <!-- Display the search query -->
+    <!-- Display search query -->
+    <h2>Results for '{{ query }}'</h2>
     <ul>
-      {% for result in results %} <!-- Loop through the search results -->
+      <!-- Loop through search results -->
+      {% for result in results %}
         <li>
+          <!-- Link to page for each person in results -->
           <h4><a href="{{ url_for('person', id=result.id) }}">{{ result.name }}</a></h4>
-          <!-- Link to the details page for each person in the search results -->
           <ul>
-            {% for item in result.paginated_gifts %} <!-- Loop through the paginated gift ideas for each person -->
-              <li>{{ item }}</li> <!-- Display each gift idea as a list item -->
+            <!-- Loop through the paginated gift ideas for each person -->
+            {% for item in result.paginated_gifts %}
+              <!-- Display each gift idea as a list item -->
+              <li>{{ item }}</li>
             {% endfor %}
           </ul>
         </li>
       {% endfor %}
     </ul>
 
-    {% if total_pages > 1 %} <!-- Check if pagination is needed -->
+    <!-- Check if pagination is needed -->
+    {% if total_pages > 1 %}
     <div class="pagination">
-      {% if page > 1 %} <!-- Show the "Previous" link if not on the first page -->
+      <!-- Show "Previous" link if not on the first page -->
+      {% if page > 1 %}
         <a href="{{ url_for('search', page=page - 1, query=query) }}">Previous</a>
       {% endif %}
 
-      {% for i in range(1, total_pages + 1) %} <!-- Loop through all pages -->
-        {% if i == page %} <!-- Highlight the current page -->
+      <!-- Loop through all pages -->
+      {% for i in range(1, total_pages + 1) %}
+        <!-- Highlight the current page -->
+        {% if i == page %}
           <span class="current">{{ i }}</span>
-        {% else %} <!-- Link to other pages -->
+        <!-- Link to other pages -->
+        {% else %}
           <a href="{{ url_for('search', page=i, query=query) }}">{{ i }}</a>
         {% endif %}
       {% endfor %}
-
-      {% if page < total_pages %} <!-- Show the "Next" link if not on the last page -->
+      <!-- Show the "Next" link if not on the last page -->
+      {% if page < total_pages %} 
         <a href="{{ url_for('search', page=page + 1, query=query) }}">Next</a>
       {% endif %}
     </div>

@@ -12,73 +12,51 @@ logging.basicConfig(level=logging.INFO, format=LOG_FORMAT)
 logger = logging.getLogger(__name__)
 
 class DatabasePersistence:
-    """
-    A class responsible for handling all database interactions for the Gift Ideas application.
-    It provides methods to interact with the PostgreSQL database for managing users,
-    people, and their associated gift ideas.
-    """
     def __init__(self):
-        """
-        Initializes the DatabasePersistence object and sets up the database schema
-        if it doesn't already exist. Also defines the number of items to display per page.
-        """
+        # initialize object and sets up database schema if it doesn't exist
         self._setup_schema()
-        self.ITEMS_PER_PAGE = 5  # Define the number of people to display per page
+        # Define the number of people to display per page
+        self.ITEMS_PER_PAGE = 5
 
     @contextmanager
     def _database_connect(self):
-        """
-        A context manager for establishing and managing a database connection.
-        It automatically handles connecting to the database based on the environment
-        (production uses DATABASE_URL environment variable, development uses 'gift_ideas' database)
-        and ensures the connection is closed after use.
-        """
+        # establish and manage database connection
         if os.environ.get('FLASK_ENV') == 'production':
             connection = psycopg2.connect(os.environ['DATABASE_URL'])
         else:
             connection = psycopg2.connect(dbname="gift_ideas")
         try:
-            # Yield the connection object within the context
             with connection:
                 yield connection
         finally:
-            # Ensure the connection is closed in the finally block
+            # Close connection after use
             connection.close()
 
     def _execute_query(self, query, params=None):
-        """
-        Executes a SQL query that is expected to return multiple results.
-        It uses a DictCursor to return results as dictionaries.
-        """
+        # Executes SQL query to return multiple results
         with self._database_connect() as conn:
+            # Use a DictCursor to return results as dictionaries
             with conn.cursor(cursor_factory=DictCursor) as cursor:
                 cursor.execute(query, params or ())
                 return cursor.fetchall()
 
     def _execute_one(self, query, params=None):
-        """
-        Executes a SQL query that is expected to return at most one result.
-        It uses a DictCursor to return the result as a dictionary.
-        """
+        # Executes SQL query to return one result
         with self._database_connect() as conn:
+            # Use a DictCursor to return the result as a dictionary
             with conn.cursor(cursor_factory=DictCursor) as cursor:
                 cursor.execute(query, params or ())
                 return cursor.fetchone()
 
     def _execute_none(self, query, params=None):
-        """
-        Executes a SQL query that does not return any results (e.g., INSERT, UPDATE, DELETE).
-        It commits the changes to the database.
-        """
+        # Executes SQL query that does not return results and commits changes
         with self._database_connect() as conn:
             with conn.cursor() as cursor:
                 cursor.execute(query, params or ())
                 conn.commit()
 
     def get_paginated_people(self, user_id, page):
-        """
-        Retrieves a paginated list of people associated with a specific user.
-        """
+        # Returns a paginated list of people for a specific user
         offset = (page - 1) * self.ITEMS_PER_PAGE
         query = """
             SELECT P.id, P.name
@@ -91,9 +69,7 @@ class DatabasePersistence:
         return [dict(row) for row in results]
 
     def get_person_count(self, user_id):
-        """
-        Retrieves the total number of people associated with a specific user.
-        """
+        # Returns the count of people for a specific user
         query = """
             SELECT COUNT(*) FROM Person WHERE user_id = %s;
         """
@@ -101,9 +77,7 @@ class DatabasePersistence:
         return result['count'] if result else 0
 
     def find_person(self, person_id, user_id):
-        """
-        Retrieves a specific person by their ID and user ID.
-        """
+        # Returns a single person based on their ID and user ID
         query = """
             SELECT P.id, P.name
             FROM Person P
@@ -113,10 +87,7 @@ class DatabasePersistence:
         return dict(person) if person else None
 
     def find_person_with_gifts(self, person_id, user_id, page, gifts_per_page):
-        """
-        Retrieves a specific person along with a paginated list of their gifts.
-        It also includes the total number of gifts for that person.
-        """
+        # Returns a specific person with their gifts
         offset = (page - 1) * gifts_per_page
         query = """
             SELECT P.id, P.name,
@@ -147,9 +118,7 @@ class DatabasePersistence:
         return person_data
 
     def get_gift_count(self, person_id):
-        """
-        Retrieves the total number of gifts associated with a specific person.
-        """
+        # Returns the count of gifts for a given person ID
         query = """
             SELECT COUNT(*) FROM Gift WHERE person_id = %s;
         """
@@ -157,10 +126,7 @@ class DatabasePersistence:
         return result['count'] if result else 0
 
     def validate_person(self, name, gift_lst, user_id, exclude_id=None):
-        """
-        Validates the name and gift list of a person to ensure they meet certain criteria
-        (uniqueness of name per user, length constraints).
-        """
+        # Validates the name and gift list of a person
         MAX_NAME_LENGTH = 50
         MAX_GIFT_LENGTH = 100
 
@@ -181,10 +147,7 @@ class DatabasePersistence:
         return None
 
     def add_person(self, person, user_id):
-        """
-        Adds a new person and their associated gifts to the database.
-        It inserts the person's name and then iterates through the gift list to add each gift.
-        """
+        # Add a new person to the database
         query_person = "INSERT INTO Person (user_id, name) VALUES (%s, %s) RETURNING id"
         query_gift = "INSERT INTO Gift (person_id, gift) VALUES (%s, %s)"
         with self._database_connect() as conn:
@@ -201,10 +164,7 @@ class DatabasePersistence:
         return person_id
 
     def update_person(self, person, new_name, gift_lst, user_id):
-        """
-        Updates an existing person's name and their list of gifts in the database.
-        It updates the person's name, deletes their existing gifts, and then inserts the new list of gifts.
-        """
+        # Updates the existing person's name and gifts
         query_update_person = "UPDATE Person SET name = %s WHERE id = %s AND user_id = %s"
         query_delete_gifts = "DELETE FROM Gift WHERE person_id = %s"
         query_insert_gift = "INSERT INTO Gift (person_id, gift) VALUES (%s, %s)"
@@ -221,19 +181,12 @@ class DatabasePersistence:
                 conn.commit()
 
     def delete_person(self, person_id, user_id):
-        """
-        Deletes a specific person from the database based on their ID and user ID.
-        The ON DELETE CASCADE constraint in the database will automatically delete
-        any associated gifts.
-        """
+        # Deletes a person and their associated gifts from the database
         query = "DELETE FROM Person WHERE id = %s AND user_id = %s"
         self._execute_none(query, (person_id, user_id))
 
     def search_matching_with_gifts(self, query_str, user_id):
-        """
-        Searches for people whose names or associated gifts contain the given query string.
-        It returns a list of people with their matching gifts.
-        """
+        # Search for people and their gifts matching the query string
         query = """
             SELECT P.id AS person_id, P.name AS person_name, G.gift
             FROM Person P
@@ -259,10 +212,7 @@ class DatabasePersistence:
         return {'results': list(grouped_results.values())}
 
     def get_search_result_count(self, query, user_id):
-        """
-        Retrieves the total count of search results (individual gifts or people)
-        matching the given query for a specific user.
-        """
+        # Returns the count of people and gifts matching the search query
         query = """
             SELECT COUNT(*)
             FROM (
@@ -276,29 +226,19 @@ class DatabasePersistence:
         return result['count'] if result else 0
 
     def create_user(self, username, password):
-        """
-        Creates a new user in the database by hashing the password and storing it.
-        Returns the ID of the newly created user.
-        """
+        # Create a new user with a hashed password, returning the user ID
         hashed_password = generate_password_hash(password)
         query = "INSERT INTO Users (username, password_hash) VALUES (%s, %s) RETURNING id"
         user = self._execute_one(query, (username, hashed_password))
         return user['id'] if user else None
 
     def get_user_by_username(self, username):
-        """
-        Retrieves a user from the database based on their username.
-        Returns the user data as a dictionary if found, otherwise None.
-        """
+        # Returns a single user based on their username
         query = "SELECT * FROM Users WHERE username = %s"
         return self._execute_one(query, (username,))
 
     def _setup_schema(self):
-        """
-        Initializes the database schema by creating the necessary tables (Person, Gift, Users)
-        if they do not already exist. It also checks for and adds the 'user_id' column
-        and a unique constraint to the 'Person' table if they are missing.
-        """
+        # Initialize the database schema (Person, Gift, Users) if not already present
         logger.info("Setting up schema if necessary.")
         with self._database_connect() as conn:
             with conn.cursor() as cursor:

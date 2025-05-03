@@ -1,6 +1,6 @@
 # Gift Ideas List
 
-Gift Ideas List is a web application that helps users organize and manage gift ideas for their friends and family. Users can create accounts, add people, and brainstorm gift ideas for each person.
+Gift Ideas List is a web application that helps users organize and manage gift ideas for their loved ones. Users can create accounts, add people, and brainstorm gift ideas for each person.
 
 ---
 

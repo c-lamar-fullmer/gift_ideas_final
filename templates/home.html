@@ -1,37 +1,42 @@
 <!-- home.html -->
 
-{% extends "layout.html" %} <!-- This template extends the base layout.html file -->
+{% extends "layout.html" %}
 
 {% block content %}
-  {% if g.user_id %} <!-- Check if the user is logged in -->
+  <!-- Check if the user is logged in -->
+  {% if g.user_id %}
     <h2>Welcome to your Gift Ideas List!</h2>
-    
-    {% if people | length > 0 %} <!-- Check if there are any people in the list -->
+    <!-- Check if there are any people in the list -->
+    {% if people | length > 0 %}
       <p>Here are the people and their gift ideas:</p>
       <ul>
-        {% for person in people %} <!-- Loop through the list of people -->
+        <!-- Loop through the list of people -->
+        {% for person in people %}
           <li>
+            <!-- Link to page for each person -->
             <a href="{{ url_for('person', id=person.id) }}">{{ person.name }}</a>
-            <!-- Link to the details page for each person -->
           </li>
         {% endfor %}
       </ul>
-
-      {% if total_pages > 1 %} <!-- Check if pagination is needed -->
+      <!-- Check if pagination is needed -->
+      {% if total_pages > 1 %}
       <div class="pagination">
-        {% if page > 1 %} <!-- Show the "Previous" link if not on the first page -->
+        <!-- Show the "Previous" link if not on the first page -->
+        {% if page > 1 %}
           <a href="{{ url_for('home', page=page - 1) }}">Previous</a>
         {% endif %}
-
-        {% for i in range(1, total_pages + 1) %} <!-- Loop through all pages -->
-          {% if i == page %} <!-- Highlight the current page -->
+        <!-- Loop through all pages -->
+        {% for i in range(1, total_pages + 1) %}
+          <!-- Highlight the current page -->
+          {% if i == page %}
             <span class="current">{{ i }}</span>
-          {% else %} <!-- Link to other pages -->
+          <!-- Link to other pages -->
+          {% else %}
             <a href="{{ url_for('home', page=i) }}">{{ i }}</a>
           {% endif %}
         {% endfor %}
-
-        {% if page < total_pages %} <!-- Show the "Next" link if not on the last page -->
+        <!-- Show the "Next" link if not on the last page -->
+        {% if page < total_pages %}
           <a href="{{ url_for('home', page=page + 1) }}">Next</a>
         {% endif %}
       </div>
