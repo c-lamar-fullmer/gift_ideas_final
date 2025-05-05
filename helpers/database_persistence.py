@@ -92,7 +92,7 @@ class DatabasePersistence:
         query = """
             SELECT P.id, P.name,
                    (SELECT COUNT(*) FROM Gift WHERE person_id = P.id) AS total_gifts,
-                   COALESCE(ARRAY_AGG(G.gift ORDER BY G.id) FILTER (WHERE G.gift IS NOT NULL), ARRAY[]::VARCHAR[]) AS all_gifts
+                   COALESCE(ARRAY_AGG(G.gift ORDER BY LOWER(G.gift) ASC) FILTER (WHERE G.gift IS NOT NULL), ARRAY[]::VARCHAR[]) AS all_gifts
             FROM Person P
             LEFT JOIN Gift G ON P.id = G.person_id
             WHERE P.id = %s AND P.user_id = %s
@@ -192,7 +192,7 @@ class DatabasePersistence:
             FROM Person P
             LEFT JOIN Gift G ON P.id = G.person_id
             WHERE P.user_id = %s AND (P.name ILIKE %s OR G.gift ILIKE %s)
-            ORDER BY P.name, G.id;
+            ORDER BY LOWER(P.name), LOWER(G.gift);
         """
         results = self._execute_query(query, (user_id, f"%{query_str}%", f"%{query_str}%"))
 
