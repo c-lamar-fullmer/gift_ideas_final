@@ -118,6 +118,12 @@ Follow these steps to install, configure, and run the application:
      poetry run python app.py
      ```
 
+   - Once the application is running, open your web browser and navigate to:
+     ```
+     http://127.0.0.1:5003
+     ```
+     This is the default address where the Flask application will be hosted in development mode. If you are running the app in production, replace the address with your production server's URL.
+
 **Test User Credentials**
 
 The seed data includes a test user account you can use to explore the application:
