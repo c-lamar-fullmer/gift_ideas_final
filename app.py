@@ -30,6 +30,19 @@ def load_db_and_user():
     # Get the user ID from the session
     g.user_id = session.get('user_id')
 
+    # Check if the user is logged in
+    if not g.user_id:
+        # Allow access to login, register, and static files without being logged in
+        if request.endpoint not in ['login', 'register', 'static'] and request.path != '/favicon.ico':
+            # Store the originally requested URL in the session if not already set
+            if 'next_url' not in session or session['next_url'] == url_for('home'):
+                # Only store non-homepage URLs
+                if request.path != '/':
+                    session['next_url'] = request.url
+            # Redirect to the login page
+            return redirect(url_for('login'))
+
+
 @app.route("/", defaults={'page': 1})
 @app.route("/page/<int:page>")
 def home(page):
@@ -46,6 +59,7 @@ def home(page):
 
     # Redirect to the first page if the requested page is out of bounds
     if page < 1 or (total_pages > 0 and page > total_pages):
+        flash("The page you are looking for does not exist.", "error")
         return redirect(url_for('home', page=1))
 
     # Retrieve a paginated list of people for the current user
@@ -306,6 +320,7 @@ def login():
     # Redirect to the homepage if the user is already logged in
     if g.user_id:
         return redirect(url_for('home'))
+
     # (POST request) Handle the form submission for login
     if request.method == "POST":
         # Get the username and password from the form
@@ -327,11 +342,16 @@ def login():
             # Store the user ID in the session to log the user in
             session['user_id'] = user['id']
             flash("Login successful!", "success")
-            return redirect(url_for('home'))
+
+            # Redirect to the originally requested URL or the homepage
+            next_url = session.pop('next_url', url_for('home'))
+            return redirect(next_url)
+
         # If login fails, display an error message
         else:
             flash("Invalid username or password.", "error")
             return render_template('login.html')
+
     # (GET request) Render the login form
     return render_template('login.html')
 
@@ -346,8 +366,15 @@ def logout():
 
 @app.errorhandler(404)
 def page_not_found(error):
-    # Redirect to the homepage for unknown pages
-    return redirect(url_for('home'))
+    # Check if the user is logged in
+    if g.user_id:
+        # Display a flash message for invalid URLs
+        flash("The page you are looking for does not exist.", "error")
+        # Redirect to the home page
+        return redirect(url_for('home'))
+    else:
+        # If the user is not logged in, redirect to the login page
+        return redirect(url_for('login'))
 
 # Run the Flask application if this script is executed directly
 if __name__ == "__main__":
