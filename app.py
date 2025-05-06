@@ -122,8 +122,8 @@ def add_person():
     # (GET request) Render the form for adding new person
     return render_template('add_person.html')
 
-@app.route("/<int:id>/edit", methods=["GET", "POST"])
-def edit_person(id):
+@app.route("/<int:id>/edit_name", methods=["GET", "POST"])
+def edit_name(id):
     # Redirect to login if the user is not logged in
     if not g.user_id:
         return redirect(url_for('login'))
@@ -136,30 +136,59 @@ def edit_person(id):
         flash("Person not found.", "error")
         return redirect(url_for('home'))
 
-    # (POST request) Handle the form submission when editing a person
+    # (POST request) Handle the form submission when editing the name
     if request.method == "POST":
-        print(request.form)  # Print all form data
-        print(request.form.getlist('gifts[]'))  # Print the list of gifts
-        # Get the updated name and gift list from the form
         new_name = request.form['name'].strip()
-        gift_lst = [gift.strip() for gift in request.form.getlist('gifts[]') if gift.strip()]
-        print(f"Submitted gifts: {gift_lst}")  # Debugging
 
-        # Validate the updated person data
-        error = g.storage.validate_person(new_name, gift_lst, g.user_id, exclude_id=id)
+        # Validate the updated name
+        error = g.storage.validate_person(new_name, person['gift_lst'], g.user_id, exclude_id=id)
         if error:
             flash(error, "error")
-            return render_template(
-                'edit_person.html', id=id, name=person['name'], gift_lst=person['gift_lst']
-            )
+            return render_template('edit_name.html', id=id, name=person['name'])
 
-        # Update the person's information in the database
-        g.storage.update_person(person, new_name, gift_lst, g.user_id)
-        flash(f"{new_name} has been modified.", "success")
+        # Update the person's name in the database
+        g.storage.update_person(person, new_name, person['gift_lst'], g.user_id)
+        flash(f"Name has been updated to {new_name}.", "success")
         return redirect(url_for('person', id=id))
 
-    # (GET request) Render the form for editing an existing person
-    return render_template('edit_person.html', id=id, name=person['name'], gift_lst=person['gift_lst'])
+    # (GET request) Render the form for editing the name
+    return render_template('edit_name.html', id=id, name=person['name'])
+
+@app.route("/<int:id>/edit_gifts", methods=["GET", "POST"])
+def edit_gifts(id):
+    # Redirect to login if the user is not logged in
+    if not g.user_id:
+        return redirect(url_for('login'))
+
+    # Retrieve the person's data along with their gifts
+    person = g.storage.find_person_with_gifts(id, g.user_id, page=1, gifts_per_page=100)
+
+    # If person not found, display an error and redirect to the homepage
+    if not person:
+        flash("Person not found.", "error")
+        return redirect(url_for('home'))
+
+    # Ensure 'gift_lst' exists in the person object
+    gift_lst = person.get('gift_lst', [])
+    name = person.get('name', 'Unknown')  # Provide a default value for name if missing
+
+    # (POST request) Handle the form submission when editing gifts
+    if request.method == "POST":
+        gift_lst = [gift.strip() for gift in request.form.getlist('gifts[]') if gift.strip()]
+
+        # Validate the updated gift list
+        error = g.storage.validate_person(name, gift_lst, g.user_id, exclude_id=id)
+        if error:
+            flash(error, "error")
+            return render_template('edit_gifts.html', id=id, name=name, gift_lst=gift_lst)
+
+        # Update the person's gifts in the database
+        g.storage.update_person(person, name, gift_lst, g.user_id)
+        flash("Gifts have been updated.", "success")
+        return redirect(url_for('person', id=id))
+
+    # (GET request) Render the form for editing gifts
+    return render_template('edit_gifts.html', id=id, name=name, gift_lst=gift_lst)
 
 @app.route("/<int:id>/delete", methods=["POST"])
 def delete_person(id):

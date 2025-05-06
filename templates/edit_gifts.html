@@ -1,0 +1,60 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<section id="edit-gifts">
+    <header>
+        <h2>Editing Gifts for {{ name }}</h2>
+    </header>
+</section>
+
+<div>
+<!-- Form to edit the person's gift ideas -->
+<form action="{{ url_for('edit_gifts', id=id) }}" method="post">
+    <dl>
+        <dt>
+            <label for="gifts">Edit Gift Ideas:</label>
+        </dt>
+        <dd>
+            <ul id="gift-list" class="gift-list">
+                <!-- Loop through the list of gifts -->
+                {% for gift in gift_lst %}
+                <li>
+                    <input type="text" name="gifts[]" value="{{ gift }}" size="50">
+                    <button type="button" class="delete-gift">Delete</button>
+                </li>
+                {% endfor %}
+            </ul>
+            <!-- Button to add a new gift -->
+            <button type="button" id="add-gift">Add Gift</button>
+        </dd>
+    </dl>
+    <fieldset>
+        <!-- Submit button to save changes -->
+        <input type="submit" value="Save">
+        
+        <!-- Cancel button to return to the person's details page without saving changes -->
+        <a href="{{ url_for('person', id=id) }}">Cancel</a>
+    </fieldset>
+</form>
+</div>
+
+<script>
+    // JavaScript to handle adding and deleting gifts dynamically
+    document.getElementById('add-gift').addEventListener('click', function() {
+        const giftList = document.getElementById('gift-list');
+        const newGift = document.createElement('li');
+        newGift.innerHTML = `
+            <input type="text" name="gifts[]" value="" size="50">
+            <button type="button" class="delete-gift">Delete</button>
+        `;
+        giftList.appendChild(newGift);
+    });
+
+    document.getElementById('gift-list').addEventListener('click', function(event) {
+        if (event.target.classList.contains('delete-gift')) {
+            const giftItem = event.target.closest('li');
+            giftItem.remove();
+        }
+    });
+</script>
+{% endblock %}

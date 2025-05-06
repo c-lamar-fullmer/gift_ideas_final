@@ -7,7 +7,7 @@
 <h2>{{ name }}</h2>
 
 <div>
-  <ul>
+  <ul class="gift-list">
     <!-- Loop through the list of gift ideas -->
     {% for item in gift_lst %}
       <!-- Display each gift idea as a list item -->
@@ -16,33 +16,9 @@
   </ul>
 </div>
 
-<!-- Check if pagination is needed for the gift list -->
-{% if total_gift_pages > 1 %}
-<div class="pagination">
-  <!-- Show the "Previous" link if not on the first page -->
-  {% if gift_page > 1 %}
-    <a href="{{ url_for('person', id=id, gift_page=gift_page - 1) }}">Previous</a>
-  {% endif %}
-  
-  <!-- Loop through all gift pages -->
-  {% for i in range(1, total_gift_pages + 1) %}
-    <!-- Highlight the current page -->
-    {% if i == gift_page %}
-      <span class="current">{{ i }}</span>
-    <!-- Link to other pages -->
-    {% else %}
-      <a href="{{ url_for('person', id=id, gift_page=i) }}">{{ i }}</a>
-    {% endif %}
-  {% endfor %}
-  <!-- Show the "Next" link if not on the last page -->
-  {% if gift_page < total_gift_pages %}
-    <a href="{{ url_for('person', id=id, gift_page=gift_page + 1) }}">Next</a>
-  {% endif %}
-</div>
-{% endif %}
-
-<div>
-  <!-- Link to edit person and gift list -->
-  <p><a href="{{ url_for('edit_person', id=id) }}">Edit Name and Gifts</a></p>
+<div class="edit-name-and-gifts">
+  <!-- Buttons to edit the name and gifts -->
+  <p><a class="button" href="{{ url_for('edit_name', id=id) }}">Edit Name</a></p>
+  <p><a class="button" href="{{ url_for('edit_gifts', id=id) }}">Edit Gifts</a></p>
 </div>
 {% endblock %}

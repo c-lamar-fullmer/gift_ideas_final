@@ -28,7 +28,7 @@
         <li>
           <!-- Link to page for each person in results -->
           <h4><a href="{{ url_for('person', id=result.id) }}">{{ result.name }}</a></h4>
-          <ul>
+          <ul class="gift-list">
             <!-- Loop through the paginated gift ideas for each person -->
             {% for item in result.paginated_gifts %}
               <!-- Display each gift idea as a list item -->

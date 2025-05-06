@@ -1,0 +1,30 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<section id="edit-name">
+    <header>
+        <h2>Editing Name</h2>
+    </header>
+</section>
+
+<div>
+<!-- Form to edit the person's name -->
+<form action="{{ url_for('edit_name', id=id) }}" method="post">
+    <dl>
+        <dt>
+            <label for="name">Enter the Name:</label>
+        </dt>
+        <dd>
+            <input type="text" name="name" value="{{ name }}" size="50">
+        </dd>
+    </dl>
+    <fieldset>
+        <!-- Submit button to save changes -->
+        <input type="submit" value="Save">
+        
+        <!-- Cancel button to return to the person's details page without saving changes -->
+        <a href="{{ url_for('person', id=id) }}">Cancel</a>
+    </fieldset>
+</form>
+</div>
+{% endblock %}

@@ -34,6 +34,12 @@ ul li {
     padding: 5px 0; /* Add space between list items */
 }
 
+/* Re-enable bullets for gift lists */
+.gift-list {
+    list-style-type: disc; /* Use default bullet points */
+    padding-left: 20px; /* Add some padding to align bullets */
+}
+
 /* Buttons and inputs */
 input[type="submit"], button {
     background-color: #3498db;
@@ -46,6 +52,31 @@ input[type="submit"], button {
 
 input[type="submit"]:hover, button:hover {
     background-color: #2980b9;
+}
+
+.edit-name-and-gifts {
+    display: flex; /* Arrange navigation links in a row */
+    gap: 10px; /* space between navigation links */
+    justify-content: left;
+    margin-top: 20px; /* space above */
+    padding: 15px; /* padding inside */
+    border-radius: 5px; /* Rounded corners */
+}
+
+/* Style for buttons */
+.button {
+    font-weight: bold;
+    color:#f9f9f9;
+    text-decoration: none; /* Remove underline */
+    padding: 10px 15px;
+    border-radius: 5px; /* Rounded corners */
+    background-color:#3498db;
+    transition: background-color 0.3s ease; /* Smooth hover effect */
+}
+
+.button:hover {
+    background-color:white;
+    color: #2c3e50; /* text on hover */
 }
 
 /* Flash messages */
