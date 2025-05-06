@@ -129,7 +129,7 @@ def edit_person(id):
         return redirect(url_for('login'))
 
     # Retrieve the person's data along with their gifts
-    person = g.storage.find_person_with_gifts(id, g.user_id, page=1, gifts_per_page=100)  # Adjust gifts_per_page as needed
+    person = g.storage.find_person_with_gifts(id, g.user_id, page=1, gifts_per_page=100)
 
     # If person not found, display an error and redirect to the homepage
     if not person:
@@ -138,29 +138,28 @@ def edit_person(id):
 
     # (POST request) Handle the form submission when editing a person
     if request.method == "POST":
+        print(request.form)  # Print all form data
+        print(request.form.getlist('gifts[]'))  # Print the list of gifts
         # Get the updated name and gift list from the form
         new_name = request.form['name'].strip()
-        gift_lst = parse_gift_list(request.form["gift_lst"].strip())
+        gift_lst = [gift.strip() for gift in request.form.getlist('gifts[]') if gift.strip()]
+        print(f"Submitted gifts: {gift_lst}")  # Debugging
 
         # Validate the updated person data
         error = g.storage.validate_person(new_name, gift_lst, g.user_id, exclude_id=id)
-        # If validation error, display it and re-render the edit form
         if error:
             flash(error, "error")
-            formatted_gift_lst = '\n'.join(person['gift_lst'])
             return render_template(
-                'edit_person.html', id=id, name=person['name'], gift_lst=formatted_gift_lst
+                'edit_person.html', id=id, name=person['name'], gift_lst=person['gift_lst']
             )
 
         # Update the person's information in the database
         g.storage.update_person(person, new_name, gift_lst, g.user_id)
-        # Display a success message and redirect to the person's details page
         flash(f"{new_name} has been modified.", "success")
         return redirect(url_for('person', id=id))
 
     # (GET request) Render the form for editing an existing person
-    formatted_gift_lst = '\n'.join(person['gift_lst'])
-    return render_template('edit_person.html', id=id, name=person['name'], gift_lst=formatted_gift_lst)
+    return render_template('edit_person.html', id=id, name=person['name'], gift_lst=person['gift_lst'])
 
 @app.route("/<int:id>/delete", methods=["POST"])
 def delete_person(id):

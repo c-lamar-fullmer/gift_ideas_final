@@ -18,17 +18,25 @@
             <label for="name">Enter the Name:</label>
         </dt>
         <dd>
-            <!-- 'value' pre-fills the input field with the current name -->
             <input type="text" name="name" value="{{ name }}" size="50">
         </dd>
 
-        <!-- editing the person's gift ideas -->
+        <!-- Editing the person's gift ideas -->
         <dt>
-            <label for="gift_lst">Enter your ideas, one line at a time:</label>
+            <label for="gifts">Edit Gift Ideas:</label>
         </dt>
         <dd>
-            <!-- 'gift_lst' pre-fills with the current list of gift ideas -->
-            <textarea name="gift_lst" rows="10" cols="50">{{ gift_lst }}</textarea>
+            <ul id="gift-list">
+                <!-- Loop through the list of gifts -->
+                {% for gift in gift_lst %}
+                <li>
+                    <input type="text" name="gifts[]" value="{{ gift }}" size="50">
+                    <button type="button" class="delete-gift">Delete</button>
+                </li>
+                {% endfor %}
+            </ul>
+            <!-- Button to add a new gift -->
+            <button type="button" id="add-gift">Add Gift</button>
         </dd>
     </dl>
     <fieldset>
@@ -43,9 +51,28 @@
 <!-- Form to delete person -->
 <form class="delete-form" action="{{ url_for('delete_person', id=id) }}" method="post">
     <fieldset>
-        <!-- Submit button to delete the person -->
         <input type="submit" value="Delete Person">
     </fieldset>
 </form>
 </div>
+
+<script>
+    // JavaScript to handle adding and deleting gifts dynamically
+    document.getElementById('add-gift').addEventListener('click', function() {
+        const giftList = document.getElementById('gift-list');
+        const newGift = document.createElement('li');
+        newGift.innerHTML = `
+            <input type="text" name="gifts[]" value="" size="50">
+            <button type="button" class="delete-gift">Delete</button>
+        `;
+        giftList.appendChild(newGift);
+    });
+
+    document.getElementById('gift-list').addEventListener('click', function(event) {
+        if (event.target.classList.contains('delete-gift')) {
+            const giftItem = event.target.closest('li');
+            giftItem.remove();
+        }
+    });
+</script>
 {% endblock %}
