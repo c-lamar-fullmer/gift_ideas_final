@@ -344,8 +344,10 @@ def login():
             flash("Login successful!", "success")
 
             # Redirect to the originally requested URL or the homepage
-            next_url = session.pop('next_url', url_for('home'))
-            return redirect(next_url)
+            next_url = session.pop('next_url', None)
+            if next_url and next_url.startswith(request.host_url):
+                return redirect(next_url)
+            return redirect(url_for('home'))
 
         # If login fails, display an error message
         else:

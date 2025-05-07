@@ -79,6 +79,23 @@ input[type="submit"]:hover, button:hover {
     color: #2c3e50; /* text on hover */
 }
 
+/* Style for action buttons (Edit Name, Edit Gifts, Delete Person) */
+.action-button {
+    font-weight: bold;
+    font-size: 16px; /* Ensure consistent font size */
+    color: #f9f9f9;
+    text-decoration: none; /* Remove underline */
+    padding: 10px 15px;
+    border-radius: 5px; /* Rounded corners */
+    background-color: #3498db;
+    transition: background-color 0.3s ease; /* Smooth hover effect */
+}
+
+.action-button:hover {
+    background-color: white;
+    color: #2c3e50; /* Text color on hover */
+}
+
 /* Flash messages */
 .flash {
     margin: 15px 0; /* space above and below flash messages */
@@ -196,4 +213,13 @@ header {
     background-color: #3498db;
     color: white;
     border-color: #3498db;
+}
+
+/* Styling for the delete-person section */
+.delete-person {
+    display: flex; /* Arrange buttons in a row */
+    justify-content: left; /* Align buttons to the left */
+    margin-top: 20px; /* Space above */
+    padding: 15px; /* Padding inside */
+    border-radius: 5px; /* Rounded corners */
 }
